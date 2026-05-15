@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.env
+.env.local
+
+prisma/migrations/
+!prisma/migrations/.gitkeep
+
+*.log
+*.tsbuildinfo
+
+.DS_Store

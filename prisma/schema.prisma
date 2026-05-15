@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Advertiser {
+  id             String    @id @default(cuid())
+  businessName   String
+  email          String    @unique
+  signedUpAt     DateTime  @default(now())
+  firstCouponAt  DateTime?
+  firstPublishAt DateTime?
+  variant        Variant
+  tasks          Task[]
+
+  @@index([variant])
+  @@index([signedUpAt])
+}
+
+model Task {
+  id           String     @id @default(cuid())
+  advertiserId String
+  advertiser   Advertiser @relation(fields: [advertiserId], references: [id])
+  kind         TaskKind
+  scheduledFor DateTime
+  state        TaskState  @default(PENDING)
+  attempts     Int        @default(0)
+  lastError    String?
+  completedAt  DateTime?
+  createdAt    DateTime   @default(now())
+
+  @@index([advertiserId])
+  @@index([state])
+  @@index([scheduledFor])
+}
+
+enum Variant {
+  A
+  B
+}
+
+enum TaskKind {
+  WELCOME_EMAIL
+  ACCOUNT_SETUP_NUDGE
+  FIRST_COUPON_DESIGN_NUDGE
+  DAY_3_CHECK_IN
+  DAY_7_SALES_HANDOFF
+}
+
+enum TaskState {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  DEAD_LETTER
+}
